@@ -1,7 +1,7 @@
 script_name('CNN HELPER')
-script_author('Revavi')
-script_version('1.1.0')
-script_version_number(2)
+script_authors('Revavi', 'adx')
+script_version('1.1.1')
+script_version_number(3)
 
 require "lib.moonloader"
 local encoding = require 'encoding'
@@ -17,7 +17,7 @@ u8 = encoding.UTF8
 
 local lfunc = {}
 
-local wDir = getWorkingDirectory()
+local wDir, this = getWorkingDirectory(), thisScript()
 
 local mVec2, mVec4, mn = imgui.ImVec2, imgui.ImVec4, imgui.new
 local zeroClr = mVec4(0,0,0,0)
@@ -97,7 +97,7 @@ function main()
 	sampRegisterChatCommand('cnn', function() mainSt = not mainSt; captchaSt = false; editAnswerSt = false end)
 	sampRegisterChatCommand('cnn_answer', function() setts.main.turn = not setts.main.turn; msg('Авто-ответчик '..(setts.main.turn and '{00ff00}Включен' or '{ff0000}Выключен')) end)
 	
-	msg('Скрипт запущен | открыть меню: /cnn | автор: '..thisScript().authors[1])
+	msg('Скрипт запущен | открыть меню: /cnn | авторы: '..table.concat(this.authors, ", "))
 	msg('Включить авто-ответчик: /cnn_answer')
 	
 	while true do
@@ -116,9 +116,9 @@ function(self)
 		setts.main.pX, setts.main.pY = imgui.GetWindowPos().x, imgui.GetWindowPos().y
 	
 		imgui.PushFont(f18)
-			imgui.CenterText('CNN HELPER v'..thisScript().version)
+			imgui.CenterText('CNN HELPER v'..this.version)
 		imgui.PopFont()
-		imgui.CenterText('by '..thisScript().authors[1], 1)
+		imgui.CenterText('by '..table.concat(this.authors, ", "), 2)
 		imgui.Separator()
 		
 		imgui.PushItemWidth(53)
@@ -268,7 +268,7 @@ function(self)
 	imgui.End()
 end)
 
-local statsWin = imgui.OnFrame(function() return setts.stats.turn and not isGamePaused() end,
+local statsWin = imgui.OnFrame(function() return setts.stats.turn and not isPauseMenuActive() and not isGamePaused() end,
 function(self)
 	imgui.SetNextWindowPos(mVec2(setts.stats.pX, setts.stats.pY), imgui.Cond.FirstUseEver, mVec2(0, 0))
 	imgui.SetNextWindowSize(mVec2(280, 114))
@@ -281,7 +281,7 @@ function(self)
 		imgui.PopFont()
 		
 		imgui.KolhozText(fa('DOLLAR_SIGN'), u8'Зарплата: $'..lfunc.sumFormat(setts.stats.money))
-		imgui.KolhozText(fa('square_list'), u8'Отредакт. объявлений: '..lfunc.sumFormat(setts.stats.all))
+		imgui.KolhozText(fa('SQUARE_LIST'), u8'Всего объявлений: '..lfunc.sumFormat(setts.stats.all))
 		imgui.KolhozText(fa('USER'), u8'Отредакт. самостоятельно: '..lfunc.sumFormat(setts.stats.myself))
 		imgui.KolhozText(fa('USER_ROBOT'), u8'Отредакт. автоматически: '..lfunc.sumFormat(setts.stats.script))
     imgui.End()
@@ -320,7 +320,7 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
 							wait(setts.main.wait)
 							sampSendDialogResponse(dialogId, v.btn, v.list, v.edited)
 							setts.stats.script = setts.stats.script + 1
-							setts.stats.all = setts.stats.all + 1
+							if v.btn == 1 then setts.stats.all = setts.stats.all + 1 end
 						end)
 					end
 				end
@@ -337,8 +337,8 @@ function sampev.onSendDialogResponse(id, button, list, input)
 			return {id, button, list, input}
 		end
 		setts.stats.myself = setts.stats.myself + 1
-		setts.stats.all = setts.stats.all + 1
-		for i, v in ipairs(answers) do 
+		if button == 1 then setts.stats.all = setts.stats.all + 1 end
+		for i, v in ipairs(answers) do
 			if author == v.author and lfunc.rusLower(textAD) == lfunc.rusLower(v.text) then
 				dialogActive, author, textAD = false, '', ''
 				return {id, button, list, input}
@@ -362,6 +362,10 @@ function sampev.onServerMessage(color, text)
 			local percent = text:match(' бонусом %+(%d+)%% от ')
 			local dopMoney = (lastMoney/100)*percent
 			setts.stats.money = setts.stats.money + dopMoney
+			lastMoney = 0
+		end
+		if text:find('%[Подсказка%] Вы не получили прибавку от редактирования своего объявления') then
+			setts.stats.money = setts.stats.money - lastMoney
 			lastMoney = 0
 		end
 		if text:find('Это объявление уже редактирует (.+)') or text:find('Произошла ошибка, попробуйте ещё раз') then
@@ -471,7 +475,7 @@ function onWindowMessage(msg, arg, argg)
 end
 
 function onScriptTerminate(script, quitGame)
-	if script == thisScript() then
+	if script == this then
 		inicfg.save(setts, settsPath)
 	end
 end
