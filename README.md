@@ -4,7 +4,7 @@
 
 _Работает только с помощью **moonloader**_.
 
-_Автор идеи: adx (adx#2794)_  
+_Автор идеи: adx (Discord: adx228)_  
 _Бета-тестер: [msihek](blast.hk/members/452405)_
 
 Основные функции:
@@ -19,7 +19,7 @@ _Бета-тестер: [msihek](blast.hk/members/452405)_
 
 ## Скриншоты/Видео
 
-*Скоро...*
+*Появятся после релиза v2.0*
 
 ## Необходимые библиотеки
 
@@ -43,13 +43,13 @@ _Бета-тестер: [msihek](blast.hk/members/452405)_
 
 ## Связь с разработчиком
 
-**Discord: _Revavi#6149_**  
+**Discord: _Revavi_**  
 [**telegram**](https://t.me/SosuPercocet)  
 [**VK**](https://vk.com/revavi)  
-[**DonationAlerts**](https://www.donationalerts.com/r/revavi_)
+[**DonationAlerts**](https://www.donationalerts.com/r/revavi)
 
 ## Список изменений
-***Подробнее вы можете узнать в информации про релизы** (Начиная с v2.0.0)*
+***Подробнее вы можете узнать в информации про релизы** (Начиная с v2.0)*
 
 **V 1.0.0 >>**
   - Релиз
